@@ -1,0 +1,6 @@
+{
+  "name": "Masnavi-i Ma'navi — Compendio Crítico y Archivo Interactivo",
+  "description": "Síntesis crítica, análisis filosófico por libros y explorador interactivo de las parábolas del Masnavi-i Ma'navi de Jalalu-'d-Din Rumi (traducción de E. H. Whinfield).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
