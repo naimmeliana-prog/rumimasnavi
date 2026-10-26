@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, Suspense, lazy } from 'react';
 import {
   BookOpen,
   Search,
@@ -12,7 +12,8 @@ import {
   Users,
   Layers,
   GitBranch,
-  Network
+  Network,
+  Loader2
 } from 'lucide-react';
 import {
   WORK_METADATA,
@@ -31,9 +32,10 @@ import {
   playCastilianStoryAudio,
   stopGlobalCastilianAudio
 } from './utils/castilianTtsClient';
-import CanvasPdfViewer from './components/CanvasPdfViewer';
 import PoeticAudiobookPlayer from './components/PoeticAudiobookPlayer';
-import MasnaviForceGraph from './components/MasnaviForceGraph';
+
+const CanvasPdfViewer = lazy(() => import('./components/CanvasPdfViewer'));
+const MasnaviForceGraph = lazy(() => import('./components/MasnaviForceGraph'));
 
 type ThemeFilter = 'all' | 'amor' | 'ego' | 'forma' | 'albedrio' | 'corazon';
 type DeepAnalysisTab = 'temas' | 'personajes' | 'trama' | 'pilares';
@@ -333,10 +335,21 @@ export default function App() {
             </p>
           </div>
 
-          <MasnaviForceGraph
-            onOpenPdfPage={openPdfAtPage}
-            onSelectStoryModal={(story) => setActiveStoryModal(story)}
-          />
+          <Suspense
+            fallback={
+              <div className="bg-[#1C1917] text-[#FBF9F5] border border-stone-800 p-12 flex flex-col items-center justify-center gap-3 min-h-[420px]">
+                <Loader2 className="w-6 h-6 animate-spin text-amber-500" />
+                <span className="text-xs font-mono-tabular uppercase tracking-widest text-stone-400">
+                  Cargando Cartografía Interactiva D3.js (82 Relatos)...
+                </span>
+              </div>
+            }
+          >
+            <MasnaviForceGraph
+              onOpenPdfPage={openPdfAtPage}
+              onSelectStoryModal={(story) => setActiveStoryModal(story)}
+            />
+          </Suspense>
         </section>
 
         {/* SECTION 2: Audiolibro Poético con Voz Masculina Realista */}
@@ -1177,12 +1190,23 @@ export default function App() {
 
       {/* High-Resolution Canvas PDF Viewer (Zero Chrome iframe blocking) */}
       {pdfViewerOpen && (
-        <CanvasPdfViewer
-          pdfUrl={WORK_METADATA.pdfPath}
-          initialPage={pdfPage}
-          books={BOOKS_DATA}
-          onClose={() => setPdfViewerOpen(false)}
-        />
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 z-50 bg-[#1C1917]/95 flex flex-col items-center justify-center gap-3 text-[#FBF9F5]">
+              <Loader2 className="w-7 h-7 animate-spin text-amber-500" />
+              <span className="text-xs font-mono-tabular uppercase tracking-widest text-stone-300">
+                Inicializando Visor PDF Canvas...
+              </span>
+            </div>
+          }
+        >
+          <CanvasPdfViewer
+            pdfUrl={WORK_METADATA.pdfPath}
+            initialPage={pdfPage}
+            books={BOOKS_DATA}
+            onClose={() => setPdfViewerOpen(false)}
+          />
+        </Suspense>
       )}
 
       {/* Quiet Editorial Footer */}
